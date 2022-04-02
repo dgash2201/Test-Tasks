@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Add Entries";
+}
+
+@model TestViewModel
+
+@foreach (var s in Model.Strings)
+{
+    <div>@s</div>
+}
+
+@functions {
+    public void Add()
+    {
+        Model.Strings.Add("jifjjfjjfjf");
+    }
+}
+
+
+@{
+    Add();
+    Add();
+}

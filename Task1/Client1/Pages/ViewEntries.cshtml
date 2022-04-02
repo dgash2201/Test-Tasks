@@ -1,0 +1,57 @@
+﻿@page
+@model Client.Pages.ViewEntriesModel
+@{
+    ViewData["Title"] = "Просмотреть записи";
+}
+
+<form method="get">
+    <div class="form-inline mb-2">
+        <div class="form-group mr-4">
+            <label class="control-label">Код: </label>
+            <input type="text" name="code" />
+        </div>
+
+        <div class="form-group mr-4">
+            <label class="control-label">Значение: </label>
+            <input type="text" name="value" />
+        </div>
+
+        <button class="btn btn-outline-dark" type="submit">Отфильтровать</button>
+    </div>
+</form>
+
+<table class="table">
+    <tr>
+        <th>Id</th>
+        <th>Код</th>
+        <th>Значение</th>
+    </tr>
+
+    @foreach(var entry in Model.Entries)
+    {
+        <tr>
+            <td>@entry.Id</td>
+            <td>@entry.Code</td>
+            <td>@entry.Value</td>
+        </tr>
+    }
+</table>
+
+@if (Model.HasPreviousPage)
+{
+    <a asp-page="/ViewEntries"
+       asp-route-pagenumber="@(Model.PageNumber - 1)"
+       class="btn btn-outline-dark">
+        <i class="glyphicon glyphicon-chevron-left"></i>
+        Назад
+    </a>
+}
+@if (Model.HasNextPage)
+{
+    <a asp-page="/ViewEntries"
+       asp-route-pagenumber="@(Model.PageNumber + 1)"
+       class="btn btn-outline-dark">
+        Вперед
+        <i class="glyphicon glyphicon-chevron-right"></i>
+    </a>
+}

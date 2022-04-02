@@ -1,0 +1,98 @@
+﻿@page
+@using Microsoft.AspNetCore.Antiforgery
+@model Client.Pages.AddEntriesModel
+@{
+    ViewData["Title"] = "Добавить записи";
+}
+@inject IAntiforgery antiforgery
+@{
+    var token = antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<table id="entriesTable" class="table" cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <th style="width:150px">Код</th>
+            <th style="width:150px">Значение</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td><input type="text" id="inputCode"/></td>
+            <td><input type="text" id="inputValue"/></td>
+            <td><button class="btn btn-outline-dark" id="btnAdd">Добавить</button></td>
+        </tr>
+    </tfoot>
+</table>
+
+<button class="btn btn-outline-dark" id="btnSave">Сохранить</button>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+
+<script type="text/javascript">
+    // Добавляем обработчик для добавления строки
+    $("body").on("click", "#btnAdd", function () {
+        var code = $("#inputCode");
+        var value = $("#inputValue");
+ 
+        var tBody = $("#entriesTable > TBODY")[0];
+ 
+        var row = tBody.insertRow(-1);
+ 
+        var cell = $(row.insertCell(-1));
+        cell.html(code.val());
+ 
+        cell = $(row.insertCell(-1));
+        cell.html(value.val());
+ 
+        cell = $(row.insertCell(-1));
+        var btnRemove = $("<button>");
+        btnRemove.attr("class", "btn btn-outline-dark");
+        btnRemove.attr("onclick", "Remove(this);");
+        btnRemove.wrapInner("Удалить");
+
+        cell.append(btnRemove);
+ 
+        code.val("");
+        value.val("");
+    });
+ 
+    // Функция удаления строки в таблице
+    function Remove(button) {
+        var row = $(button).closest("TR");
+        var name = $("TD", row).eq(0).html();
+        if (confirm("Удалить запись с кодом: " + name + "?")) {
+            var table = $("#entriesTable")[0];
+ 
+            table.deleteRow(row[0].rowIndex);
+        }
+    };
+ 
+    // Добавляем обработчик для кнопки "Сохранить"
+    $("body").on("click", "#btnSave", function () {
+        var entries = new Array();
+        $("#entriesTable TBODY TR").each(function () {
+            var row = $(this);
+            var entry = {};
+            entry.Code = row.find("TD").eq(0).html();
+            entry.Value = row.find("TD").eq(1).html();
+            entries.push(entry);
+        });
+ 
+        $.ajax({
+            type: "POST",
+            url: "/AddEntries",
+            headers: { "RequestVerificationToken": '@token' },
+            data: JSON.stringify(entries),
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                alert("Количество добавленных записей: " + response);
+                location.reload();
+            }
+        });
+    });
+</script>

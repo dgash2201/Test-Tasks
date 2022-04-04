@@ -21,7 +21,7 @@ namespace Server.Services
 
         public async Task<int> SaveAsync(List<Dictionary<int, string>> entryList)
         {
-            _dbContext.Entries.RemoveRange(_dbContext.Entries);
+            await _dbContext.Database.ExecuteSqlRawAsync($"truncate table {nameof(_dbContext.Entries)}");
 
             var entries = entryList
                 .SelectMany(x => x.Select(kvp => new Entry
